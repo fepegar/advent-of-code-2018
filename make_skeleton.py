@@ -36,11 +36,11 @@ if __name__ == "__main__":
 
 """
 
-for i in range(3, 26):
-    day_string = f'day_{i:02d}'
+for i in range(25):
+    day_string = f'day_{i + 1:02d}'
     day_dir = Path(day_string)
     code_path = day_dir / f'{day_string}.py'
     code_path.write_text(TEMPLATE)
-    (day_dir / 'input.txt').touch()
-    (day_dir / 'example_1.txt').touch()
-    (day_dir / 'example_2.txt').touch()
+    files = 'input', 'example_1', 'example_2'
+    for filename in files:
+        (day_dir / f'{filename}.txt').touch()
