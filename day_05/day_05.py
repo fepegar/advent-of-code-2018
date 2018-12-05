@@ -30,12 +30,17 @@ def react(polymer):
         reactions = diffs == DIFF_CASE
         if not reactions.any():
             break
-        # Where two letters are going to disappear
-        indices = np.flatnonzero(reactions)
-        # But not if there are three together
-        indices = np.delete(indices, np.flatnonzero(np.diff(indices) == 1) + 1)
-        polymer = np.delete(polymer, [indices, indices + 1])
+        polymer = reduce_polymer(polymer, reactions)
     return polymer
+
+
+def reduce_polymer(polymer, reactions):
+    # Where two letters are going to disappear
+    indices = np.flatnonzero(reactions)
+    # But not if there are three together
+    indices = np.delete(indices, np.flatnonzero(np.diff(indices) == 1) + 1)
+    short_polymer = np.delete(polymer, [indices, indices + 1])
+    return short_polymer
 
 
 def remove_monomers(string, char):
