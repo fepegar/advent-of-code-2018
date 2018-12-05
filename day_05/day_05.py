@@ -1,4 +1,3 @@
-import sys
 import numpy as np
 
 DIFF_CASE = 32  # distance between lower and upper case in ASCII
@@ -71,9 +70,6 @@ if __name__ == "__main__":
     verbose = True
 
     data = read_input('input.txt')
-
-    # Maximum level of recursion was being reached
-    sys.setrecursionlimit(len(data))
 
     p('Part 1', verbose=verbose)
     example_1 = part_1(read_input('example_1.txt'))
