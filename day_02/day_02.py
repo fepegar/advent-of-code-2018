@@ -2,6 +2,11 @@ from itertools import combinations
 from collections import defaultdict
 
 
+def p(*args, verbose=True):
+    if verbose:
+        print(*args)
+
+
 def get_boxes(filepath):
     with open(filepath) as f:
         boxes_ids = f.read().splitlines()
@@ -49,16 +54,17 @@ def find_correct_boxes(filepath):
 
 
 if __name__ == "__main__":
-    print('Part 1')
+    verbose = False
+    p('Part 1', verbose=verbose)
     example_1 = get_checksum('example_1.txt')
-    print('Example:', example_1)
+    p('Example:', example_1, verbose=verbose)
     part_1 = get_checksum('box_ids.txt')
-    print('Answer:', part_1)
+    p('Answer:', part_1, verbose=verbose)
 
-    print()
+    p(verbose=verbose)
 
-    print('Part 2')
+    p('Part 2', verbose=verbose)
     example_2 = find_correct_boxes('example_2.txt')
-    print('Example:', example_2)
+    p('Example:', example_2, verbose=verbose)
     part_2 = find_correct_boxes('box_ids.txt')
-    print('Answer:', part_2)
+    p('Answer:', part_2, verbose=verbose)
