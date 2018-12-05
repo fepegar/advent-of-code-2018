@@ -26,14 +26,14 @@ def decode_polymer(numbers):
 
 
 def react(polymer):
-    diffs = np.abs(np.diff(polymer))
-    reactions = diffs == DIFF_CASE
-    if reactions.any():
+    while True:
+        diffs = np.abs(np.diff(polymer))
+        reactions = diffs == DIFF_CASE
+        if not reactions.any():
+            break
         index = np.flatnonzero(reactions)[0]
         polymer = np.delete(polymer, [index, index + 1])
-        return react(polymer)
-    else:
-        return polymer
+    return polymer
 
 
 def remove_monomers(string, char):
@@ -56,8 +56,9 @@ def get_length_shortest_polymer(string):
 
 def part_1(string):
     polymer = encode_polymer(string)
-    resulting_polymer = decode_polymer(react(polymer))
-    answer = len(resulting_polymer)
+    short_polymer = react(polymer)
+    result_string = decode_polymer(short_polymer)
+    answer = len(result_string)
     return answer
 
 
@@ -80,7 +81,7 @@ if __name__ == "__main__":
     answer_1 = part_1(data)
     p('Answer:', answer_1, verbose=verbose)
 
-    # p(verbose=verbose)
+    p(verbose=verbose)
 
     p('Part 2', verbose=verbose)
     example_2 = part_2(read_input('example_1.txt'))
