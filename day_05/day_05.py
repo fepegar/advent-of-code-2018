@@ -44,13 +44,13 @@ def remove_monomers(string, char):
 
 def get_length_shortest_polymer(string):
     all_chars = set(string.lower())
-    lengths = {}  # instead of list, for debugging
-    for char in all_chars:
+    lengths = np.empty(all_chars, np.uint16)
+    for i, char in enumerate(all_chars):
         substring = remove_monomers(string, char)
         polymer = encode_polymer(substring)
         resulting_polymer = decode_polymer(react(polymer))
-        lengths[char] = len(resulting_polymer)
-    return min(lengths.values())
+        lengths[i] = len(resulting_polymer)
+    return lengths.min()
 
 
 def part_1(string):
