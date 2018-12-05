@@ -1,12 +1,11 @@
 from pathlib import Path
 
 TEMPLATE = """
-from pprint import pprint
 
 
 def p(*args, verbose=True):
     if verbose:
-        pprint(*args)
+        print(*args)
 
 
 def read_input(filepath):
@@ -46,7 +45,7 @@ if __name__ == "__main__":
 
 """
 
-for i in range(4, 25):
+for i in range(25):
     day_string = f'day_{i + 1:02d}'
     day_dir = Path(day_string)
     code_path = day_dir / f'{day_string}.py'

@@ -1,10 +1,9 @@
 
-from pprint import pprint
 
 
 def p(*args, verbose=True):
     if verbose:
-        pprint(*args)
+        print(*args)
 
 
 def read_input(filepath):
