@@ -34,6 +34,20 @@ def react(polymer):
     return polymer
 
 
+# Recursive
+def react_recursive(polymer):
+    """
+    Needs something like sys.setrecursionlimit(len(data)) in main first
+    """
+    diffs = np.abs(np.diff(polymer))
+    reactions = diffs == DIFF_CASE
+    if reactions.any():
+        polymer = reduce_polymer(polymer, reactions)
+        return react_recursive(polymer)
+    else:
+        return polymer
+
+
 def reduce_polymer(polymer, reactions):
     # Where two letters are going to disappear
     indices = np.flatnonzero(reactions)
