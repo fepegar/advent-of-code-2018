@@ -30,8 +30,11 @@ def react(polymer):
         reactions = diffs == DIFF_CASE
         if not reactions.any():
             break
-        index = np.flatnonzero(reactions)[0]
-        polymer = np.delete(polymer, [index, index + 1])
+        # Where two letters are going to disappear
+        indices = np.flatnonzero(reactions)
+        # But not if there are three together
+        indices = np.delete(indices, np.flatnonzero(np.diff(indices) == 1) + 1)
+        polymer = np.delete(polymer, [indices, indices + 1])
     return polymer
 
 
@@ -44,7 +47,7 @@ def remove_monomers(string, char):
 
 def get_length_shortest_polymer(string):
     all_chars = set(string.lower())
-    lengths = np.empty(all_chars, np.uint16)
+    lengths = np.empty(len(all_chars), np.uint16)
     for i, char in enumerate(all_chars):
         substring = remove_monomers(string, char)
         polymer = encode_polymer(substring)
@@ -57,8 +60,7 @@ def part_1(string):
     polymer = encode_polymer(string)
     short_polymer = react(polymer)
     result_string = decode_polymer(short_polymer)
-    answer = len(result_string)
-    return answer
+    return result_string
 
 
 def part_2(string):
@@ -67,20 +69,23 @@ def part_2(string):
 
 
 if __name__ == "__main__":
-    verbose = True
+    verbose = False
 
+    example_data = read_input('example_1.txt')
     data = read_input('input.txt')
 
     p('Part 1', verbose=verbose)
-    example_1 = part_1(read_input('example_1.txt'))
+    example_result_string = part_1(example_data)
+    example_1 = len(example_result_string)
     p('Example:', example_1, verbose=verbose)
-    answer_1 = part_1(data)
+    result_string = part_1(data)
+    answer_1 = len(result_string)
     p('Answer:', answer_1, verbose=verbose)
 
     p(verbose=verbose)
 
     p('Part 2', verbose=verbose)
-    example_2 = part_2(read_input('example_1.txt'))
+    example_2 = part_2(example_result_string)
     p('Example:', example_2, verbose=verbose)
-    answer_2 = part_2(data)
+    answer_2 = part_2(result_string)
     p('Answer:', answer_2, verbose=verbose)
