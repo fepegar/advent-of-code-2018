@@ -1,26 +1,42 @@
-function Voronoi(coordinatesString) {
+function Voronoi(coordinatesString, useManhattan) {
   this.points = parseCoordinates(coordinatesString);
   var bounds = findBounds(this.points);
   this.cellsX = bounds[0] + 2;
   this.cellsY = bounds[1] + 2;
-  this.grid = getGrid(this.cellsX, this.cellsY);
+  this.showDistances = false;
+  this.useManhattan = useManhattan;
+  this.maxSumDistances = 0;
+  this.distanceThreshold;
 
-  // Fill grid with initial points
-  for (var i = 0; i < points.length; i++) {
-    this.grid[points[i].y][points[i].x] = i;
-  }
 
   this.computeDistances = function() {
     var here;
     var distances;
     var maxes;
+    var sumDistances;
+
+    this.grid = getGrid(this.cellsX, this.cellsY);
+    // Fill grid with initial points
+    for (var i = 0; i < points.length; i++) {
+      this.grid[points[i].y][points[i].x] = i;
+    }
+
+    this.distancesGrid = getGrid(this.cellsX, this.cellsY);
+
     for (var i = 0; i < this.cellsY; i++) {
       for (var j = 0; j < this.cellsX; j++) {
         here = createVector(j, i);
         distances = [];
         for (var idx = 0; idx < this.points.length; idx++) {
-          distances[idx] = manhattanDistance(here, this.points[idx]);
+          if (this.useManhattan) {
+            distances[idx] = manhattanDistance(here, this.points[idx]);
+          } else {
+            distances[idx] = euclideanDistance(here, this.points[idx]);
+          }
         }
+        sumDistances = distances.reduce((a, b) => a + b, 0);
+        this.maxSumDistances = max(this.maxSumDistances, sumDistances)
+        this.distancesGrid[i][j] = sumDistances;
         maxIndex = indexOfMin(distances);
         distances.sort(function(a, b){return a - b});
         if (distances[0] == distances[1] || distances[0] == 0) {
@@ -43,13 +59,28 @@ function Voronoi(coordinatesString) {
     rectMode(CORNER);
     noStroke();
     colorMode(HSB, points.length, 100, 100);
+    var sizeSafe = 0;
     for (var i = 0; i < this.cellsY; i++) {
       for (var j = 0; j < this.cellsX; j++) {
-        value = this.grid[i][j];
-        if (value == -1) {
-          cellColor = color(10, 0, 10);
+        if (!this.showDistances) {
+          colorMode(HSB, points.length, 100, 100);
+          value = this.grid[i][j];
+          if (value == -1) {
+            cellColor = color(10, 0, 10);
+          } else {
+            cellColor = color(value, 75, 75);
+          }
         } else {
-          cellColor = color(value, 75, 75);
+          // colorMode(RGB, this.maxSumDistances);
+          colorMode(RGB, 255);
+          value = this.distancesGrid[i][j];
+          if (value < this.distanceThreshold) {
+            sizeSafe++;
+            cellColor = color(200);
+          } else {
+            cellColor = color(100);
+          }
+          // cellColor = color(value);
         }
         x = j * cellWidth;
         y = i * cellHeight;
@@ -58,8 +89,11 @@ function Voronoi(coordinatesString) {
       }
     }
 
+    print('Safe area:', sizeSafe)
+
     // Initial points are more visible
     var point;
+    colorMode(HSB, points.length, 100, 100);
     for (var idx = 0; idx < points.length; idx++) {
       point = points[idx];
       value = this.grid[point.y][point.x];
@@ -102,6 +136,10 @@ function Voronoi(coordinatesString) {
         }
     });
     return maxArea;
+  }
+
+  this.getSafeRegion = function() {
+
   }
 }
 
@@ -153,6 +191,11 @@ function manhattanDistance(point1, point2) {
   var diffX = abs(point1.x - point2.x);
   var diffY = abs(point1.y - point2.y);
   return diffX + diffY;
+}
+
+
+function euclideanDistance(point1, point2) {
+  return dist(point1.x, point1.y, point2.x, point2.y);
 }
 
 

@@ -1,4 +1,4 @@
-const example = `1, 1
+const EXAMPLE = `1, 1
 1, 6
 8, 3
 3, 4
