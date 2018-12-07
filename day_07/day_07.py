@@ -36,7 +36,8 @@ def get_tree_root(nodes):
 def assemble(nodes):
     root = get_tree_root(nodes)
     available = [root]
-
+    while available:
+        root.
 
 
 
@@ -54,11 +55,7 @@ class Node:
 
     def assemble(self, available):
         self.assembled = True
-        available.extend(self.children)
-        available.sort()
 
-        for child in self.children:
-            pass
 
 
 def part_1(data):
