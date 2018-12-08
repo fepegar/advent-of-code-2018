@@ -29,6 +29,20 @@ class Node:
     def __repr__(self):
         return self.id
 
+    def get_value(self):
+        if not self.children:
+            value = sum(self.metadata_entries)
+        else:
+            values = []
+            for entry in self.metadata_entries:
+                try:
+                    child = self.children[entry - 1]
+                    values.append(child.get_value())
+                except IndexError:
+                    pass
+            value = sum(values)
+        return value
+
     def add_child(self, node):
         self.children.append(node)
         self.children_left -= 1
@@ -36,10 +50,6 @@ class Node:
     def read_metadata(self, queue):
         self.metadata_entries = [
             queue.popleft() for _ in range(self.num_metadata)]
-        # print('Metadata read:', self.metadata_entries)
-
-    def get_checksum(self):
-        return sum(self.metadata_entries)
 
 
 
@@ -68,7 +78,7 @@ class Tree:
                 stack.pop()
 
     def get_checksum(self):
-        return sum(node.get_checksum() for node in self.nodes)
+        return sum(node.get_value() for node in self.nodes)
 
     def get_graph(self):
         dot = Digraph()
@@ -79,6 +89,9 @@ class Tree:
                 dot.edge(parent.id, child.id)
         return dot
 
+    def get_value(self):
+        return self.root.get_value()
+
 
 
 def part_1(tree):
@@ -86,8 +99,8 @@ def part_1(tree):
     return answer
 
 
-def part_2(data):
-    answer = None
+def part_2(tree):
+    answer = tree.get_value()
     return answer
 
 
@@ -103,10 +116,10 @@ if __name__ == "__main__":
     answer_1 = part_1(data)
     p('Answer 1:', answer_1, verbose=verbose)
 
-    # p(verbose=verbose)
+    p(verbose=verbose)
 
-    # p('Part 2', verbose=verbose)
-    # example_2 = part_2(example)
-    # p('Example 2:', example_2, verbose=verbose)
-    # answer_2 = part_2(data)
-    # p('Answer 2:', answer_2, verbose=verbose)
+    p('Part 2', verbose=verbose)
+    example_2 = part_2(example)
+    p('Example 2:', example_2, verbose=verbose)
+    answer_2 = part_2(data)
+    p('Answer 2:', answer_2, verbose=verbose)
