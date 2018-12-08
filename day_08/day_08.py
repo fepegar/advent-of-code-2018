@@ -1,4 +1,7 @@
+from collections import deque
+from string import ascii_uppercase
 
+from graphviz import Digraph
 
 
 def p(*args, verbose=True):
@@ -8,12 +11,78 @@ def p(*args, verbose=True):
 
 def read_input(filepath):
     with open(filepath) as f:
-        lines = f.read().splitlines()
-    return lines
+        numbers = [int(c) for c in f.read().split()]
+    tree = Tree(numbers)
+    return tree
 
 
-def part_1(data):
-    answer = None
+class Node:
+    def __init__(self, node_id, num_children, num_metadata):
+        self.id = str(node_id)
+        self.num_children = num_children
+        self.num_metadata = num_metadata
+        self.children_left = self.num_children
+        self.children = []
+        self.metadata_entries = None
+        # print('New node:', self, num_children, self.num_metadata)
+
+    def __repr__(self):
+        return self.id
+
+    def add_child(self, node):
+        self.children.append(node)
+        self.children_left -= 1
+
+    def read_metadata(self, queue):
+        self.metadata_entries = [
+            queue.popleft() for _ in range(self.num_metadata)]
+        # print('Metadata read:', self.metadata_entries)
+
+    def get_checksum(self):
+        return sum(self.metadata_entries)
+
+
+
+class Tree:
+    def __init__(self, numbers):
+        queue = deque(numbers)
+        # ids = list(reversed(ascii_uppercase))
+        num_children = queue.popleft()
+        num_metadata = queue.popleft()
+        node_id = 0
+        self.root = Node(node_id, num_children, num_metadata)
+        node_id += 1
+        self.nodes = [self.root]
+        stack = [self.root]
+        while stack:
+            if stack[-1].children_left > 0:
+                num_children = queue.popleft()
+                num_metadata = queue.popleft()
+                node = Node(node_id, num_children, num_metadata)
+                node_id += 1
+                stack[-1].add_child(node)
+                stack.append(node)
+                self.nodes.append(node)
+            else:
+                stack[-1].read_metadata(queue)
+                stack.pop()
+
+    def get_checksum(self):
+        return sum(node.get_checksum() for node in self.nodes)
+
+    def get_graph(self):
+        dot = Digraph()
+        for node in self.nodes:
+            dot.node(node.id)
+        for parent in self.nodes:
+            for child in parent.children:
+                dot.edge(parent.id, child.id)
+        return dot
+
+
+
+def part_1(tree):
+    answer = tree.get_checksum()
     return answer
 
 
@@ -25,19 +94,19 @@ def part_2(data):
 if __name__ == "__main__":
     verbose = True
 
+    example = read_input('example.txt')
     data = read_input('input.txt')
 
     p('Part 1', verbose=verbose)
-    example_1 = part_1(read_input('example_1.txt'))
-    p('Example:', example_1, verbose=verbose)
+    example_1 = part_1(example)
+    p('Example 1:', example_1, verbose=verbose)
     answer_1 = part_1(data)
-    p('Answer:', answer_1, verbose=verbose)
+    p('Answer 1:', answer_1, verbose=verbose)
 
-    p(verbose=verbose)
+    # p(verbose=verbose)
 
-    p('Part 2', verbose=verbose)
-    example_2 = part_2(read_input('example_2.txt'))
-    p('Example:', example_2, verbose=verbose)
-    answer_2 = part_2(data)
-    p('Answer:', answer_2, verbose=verbose)
-
+    # p('Part 2', verbose=verbose)
+    # example_2 = part_2(example)
+    # p('Example 2:', example_2, verbose=verbose)
+    # answer_2 = part_2(data)
+    # p('Answer 2:', answer_2, verbose=verbose)
