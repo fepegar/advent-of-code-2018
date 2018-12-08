@@ -49,6 +49,7 @@ def assemble_nodes_delay(nodes, workers):
     workers_columns = [f'W {i}' for i in range(len(workers))]
     columns = ['Second'] + workers_columns + ['Done']
     print('\t'.join(columns))
+
     while len(result) < len(nodes): # ? available:
         available.sort(reverse=True, key=lambda node: node.id)
         for worker in workers:
@@ -62,7 +63,10 @@ def assemble_nodes_delay(nodes, workers):
             if node is not None:
                 result.append(node.id)
         second += 1
-    return ''.join(result)
+    workers_columns = [worker.node.id if worker.node is not None else '.' for worker in workers]
+    columns = [str(second)] + workers_columns + [''.join(result)]
+    print('\t'.join(columns))
+    return second
 
 
 
@@ -88,7 +92,8 @@ class Node:
 
     def parents_assembled(self):
         assembled = [parent.assembled for parent in self.parents]
-        return all(assembled)
+        all_parents_assembled = all(assembled)
+        return all_parents_assembled
 
 
 
@@ -112,6 +117,20 @@ class Worker:
                 return node
 
 
+def get_graph(filepath):
+    from graphviz import Digraph
+    dot = Digraph()
+    with open(filepath) as f:
+        text = f.read()
+    pattern = re.compile(r'Step ([A-Z]) .* step ([A-Z])')
+    pairs = pattern.findall(text)
+    parents, children = zip(*pairs)
+    all_chars = set(parents + children)
+    for char in all_chars:
+        dot.node(char)
+    for parent, child in pairs:
+        dot.edge(parent, child)
+    return dot
 
 
 def part_1(nodes):
@@ -131,10 +150,9 @@ def part_2(nodes, num_workers, short=False):
 if __name__ == "__main__":
     verbose = True
 
+    p('Part 1', verbose=verbose)
     example_data = read_input('example_1.txt')
     input_data = read_input('input.txt')
-
-    p('Part 1', verbose=verbose)
     example_1 = part_1(example_data)
     p('Example 1:', example_1, verbose=verbose)
     answer_1 = part_1(input_data)
@@ -143,7 +161,9 @@ if __name__ == "__main__":
     p(verbose=verbose)
 
     p('Part 2', verbose=verbose)
+    example_data = read_input('example_1.txt')
+    input_data = read_input('input.txt')
     example_2 = part_2(example_data, 2, short=True)
     p('Example:', example_2, verbose=verbose)
-    # answer_2 = part_2(input_data)
-    # p('Answer:', answer_2, verbose=verbose)
+    answer_2 = part_2(input_data, 5)
+    p('Answer:', answer_2, verbose=verbose)
