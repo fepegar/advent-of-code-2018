@@ -60,6 +60,8 @@ def play(num_players, last_marble):
             removed = circle.pop(remove_index)
             score = marble + removed
             current_index = remove_index
+            if current_index < 0:
+                current_index += len(circle) + 1
             scores[player] += score
     return circle, scores
 
