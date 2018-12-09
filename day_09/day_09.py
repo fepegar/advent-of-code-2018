@@ -1,6 +1,7 @@
 import re
 from itertools import cycle
 
+from tqdm import tqdm
 
 def p(*args, verbose=True):
     if verbose:
@@ -43,9 +44,8 @@ def play(num_players, last_marble):
     marble = 0
     circle = [marble]
     current_index = 0
-    while marble < last_marble:
+    for marble in tqdm(range(1, last_marble + 1)):
         player = next(players)
-        marble += 1
         length = len(circle)
         if marble % 23:
             insert_index = (current_index + 2) % length
@@ -74,7 +74,11 @@ def part_1(data):
 
 
 def part_2(data):
-    answer = None
+    num_players, last_marble = data
+    last_marble *= 100
+    _, scores = play(num_players, last_marble)
+    highest_score = max(scores.values())
+    answer = highest_score
     return answer
 
 
@@ -94,7 +98,5 @@ if __name__ == "__main__":
     p(verbose=verbose)
 
     p('Part 2', verbose=verbose)
-    example_2 = part_2(example)
-    p('Example 2:', example_2, verbose=verbose)
     answer_2 = part_2(data)
     p('Answer 2:', answer_2, verbose=verbose)
