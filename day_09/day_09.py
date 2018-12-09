@@ -1,8 +1,10 @@
 import re
-from itertools import cycle
 from collections import deque, defaultdict
 
 from tqdm import tqdm
+
+verbose = False
+
 
 def p(*args, verbose=True):
     if verbose:
@@ -43,7 +45,9 @@ def play(num_players, last_marble):
     scores = defaultdict(int)
     marble = 0
     circle = deque([marble])
-    for marble in tqdm(range(1, last_marble + 1)):
+    marbles = range(1, last_marble + 1)
+    iterable = tqdm(marbles) if verbose else marbles
+    for marble in iterable:
         player = marble % num_players
         if marble % 23:
             circle.rotate(-1)
@@ -74,8 +78,6 @@ def part_2(data):
 
 
 if __name__ == "__main__":
-    verbose = True
-
     examples = read_input('example.txt')
     data = read_input('input.txt')
 
