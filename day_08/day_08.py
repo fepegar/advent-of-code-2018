@@ -47,6 +47,9 @@ class Node:
         self.children.append(node)
         self.children_left -= 1
 
+    def add_metadata(self):
+        return sum(self.metadata_entries)
+
     def read_metadata(self, queue):
         self.metadata_entries = [
             queue.popleft() for _ in range(self.num_metadata)]
@@ -78,7 +81,7 @@ class Tree:
                 stack.pop()
 
     def get_checksum(self):
-        return sum(node.get_value() for node in self.nodes)
+        return sum(node.add_metadata() for node in self.nodes)
 
     def get_graph(self):
         dot = Digraph()
