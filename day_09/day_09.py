@@ -1,5 +1,6 @@
 import re
 from itertools import cycle
+from collections import deque, defaultdict
 
 from tqdm import tqdm
 
@@ -39,30 +40,20 @@ def print_circle(circle, player, current_index, num_players, last_marble):
 
 
 def play(num_players, last_marble):
-    scores = {i: 0 for i in range(1, num_players + 1)}
-    players = cycle(range(1, num_players + 1))
+    scores = defaultdict(int)
     marble = 0
-    circle = [marble]
-    current_index = 0
+    circle = deque([marble])
     for marble in tqdm(range(1, last_marble + 1)):
-        player = next(players)
-        length = len(circle)
+        player = marble % num_players
         if marble % 23:
-            insert_index = (current_index + 2) % length
-            if insert_index == 0:
-                circle.append(marble)
-                current_index = len(circle) - 1
-            else:
-                circle.insert(insert_index, marble)
-                current_index = insert_index
+            circle.rotate(-1)
+            circle.append(marble)
         else:
-            remove_index = current_index - 7
-            removed = circle.pop(remove_index)
+            circle.rotate(7)
+            removed = circle.pop()
             score = marble + removed
-            current_index = remove_index
-            if current_index < 0:
-                current_index += len(circle) + 1
             scores[player] += score
+            circle.rotate(-1)
     return circle, scores
 
 
